@@ -33,14 +33,19 @@ public class UserController {
         return userService.findById(id);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        userService.deleteById(id);
-    }
-
     @PutMapping("/{id}")
     public UserModel update (@PathVariable Long id, @RequestBody UserCreateDTO userDto) {
         return userService.update(id, userDto);
+    }
+
+    @PatchMapping("/{id}")
+    public UserModel partialUpdate (@PathVariable Long id, @RequestBody UserCreateDTO userDto) {
+        return userService.partialUpdate(id, userDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable Long id) {
+        userService.deleteById(id);
     }
 
 }
