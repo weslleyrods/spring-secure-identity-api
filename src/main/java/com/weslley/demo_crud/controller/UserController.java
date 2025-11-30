@@ -2,6 +2,7 @@ package com.weslley.demo_crud.controller;
 
 import com.weslley.demo_crud.model.UserModel;
 import com.weslley.demo_crud.service.UserService;
+import com.weslley.demo_crud.dto.user.UserResponseDTO;
 import com.weslley.demo_crud.dto.user.UserCreateDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,30 +17,32 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public UserModel create(@RequestBody UserCreateDTO userDto) {
+    public UserResponseDTO create(@RequestBody UserCreateDTO userDto) {
         UserModel userModel = new UserModel();
         BeanUtils.copyProperties(userDto, userModel);
-        return userService.save(userModel);
+        return UserResponseDTO.from(userModel);
     }
 
     @GetMapping
-    public List<UserModel> findAll() {
-        return userService.findAll();
+    public List<UserResponseDTO> findAll() {
+        return userService.findAll().stream()
+                .map(UserResponseDTO::from)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public UserModel findById(@PathVariable Long id) {
-        return userService.findById(id);
+    public UserResponseDTO findById(@PathVariable Long id) {
+        return UserResponseDTO.from(userService.findById(id));
     }
 
     @PutMapping("/{id}")
-    public UserModel update (@PathVariable Long id, @RequestBody UserCreateDTO userDto) {
-        return userService.update(id, userDto);
+    public UserResponseDTO update (@PathVariable Long id, @RequestBody UserCreateDTO userDto) {
+        return UserResponseDTO.from(userService.update(id, userDto));
     }
 
     @PatchMapping("/{id}")
-    public UserModel partialUpdate (@PathVariable Long id, @RequestBody UserCreateDTO userDto) {
-        return userService.partialUpdate(id, userDto);
+    public UserResponseDTO partialUpdate (@PathVariable Long id, @RequestBody UserCreateDTO userDto) {
+        return UserResponseDTO.from(userService.partialUpdate(id, userDto));
     }
 
     @DeleteMapping("/{id}")
