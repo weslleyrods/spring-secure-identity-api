@@ -27,6 +27,20 @@ public class TokenService {
         return token;
     }
 
+    public String validateToken(String token) {
+        try{
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.require(algorithm)
+                    .withIssuer("demo-crud-api")
+                    .build()
+                    .verify(token)
+                    .getSubject();
+        }catch (Exception e){
+            return e.getMessage();
+        }
+    }
+
+
     private Instant genExpirationDate() {
         return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
     }
