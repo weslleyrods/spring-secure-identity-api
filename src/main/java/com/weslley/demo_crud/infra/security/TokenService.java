@@ -9,6 +9,7 @@ import com.weslley.demo_crud.model.UserModel;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 
 
 @Service
@@ -42,6 +43,6 @@ public class TokenService {
 
 
     private Instant genExpirationDate() {
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+        return Instant.now().plus(2, ChronoUnit.HOURS);
     }
 }
