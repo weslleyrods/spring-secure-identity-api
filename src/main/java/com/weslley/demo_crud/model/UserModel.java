@@ -14,7 +14,7 @@ public class UserModel implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id ;
+    private Long id ;
     private String name;
     @Column(unique = true)
     private String email;
@@ -24,11 +24,11 @@ public class UserModel implements UserDetails {
 
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        id = id;
     }
 
     public String getName() {
@@ -94,4 +94,8 @@ public class UserModel implements UserDetails {
     }
 
 
+    public static class RefreshTokenModel {
+
+        private String refreshToken;
+    }
 }

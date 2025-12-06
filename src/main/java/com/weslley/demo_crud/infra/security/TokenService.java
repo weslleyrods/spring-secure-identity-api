@@ -2,13 +2,14 @@ package com.weslley.demo_crud.infra.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.weslley.demo_crud.model.RefreshTokenModel;
+import com.weslley.demo_crud.repository.RefreshTokenRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.weslley.demo_crud.model.UserModel;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
 
@@ -16,6 +17,8 @@ import java.time.temporal.ChronoUnit;
 public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
 
     public String generateToken(UserModel user) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -26,6 +29,21 @@ public class TokenService {
         .sign(algorithm);
 
         return token;
+    }
+
+    public String generateRefreshToken(UserModel user) {
+        Instant expirationDate = genRefreshTokenExpirationDate();
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        String refreshToken = JWT.create()
+        .withIssuer("demo-crud-api")
+        .withSubject(user.getEmail())
+        .withExpiresAt(expirationDate)
+        .sign(algorithm);
+
+        RefreshTokenModel refreshTokenModel = new RefreshTokenModel(refreshToken, expirationDate, user);
+
+        refreshTokenRepository.save(refreshTokenModel);
+        return refreshToken;
     }
 
     public String validateToken(String token) {
@@ -45,4 +63,9 @@ public class TokenService {
     private Instant genExpirationDate() {
         return Instant.now().plus(2, ChronoUnit.HOURS);
     }
+
+    private Instant genRefreshTokenExpirationDate() {
+        return Instant.now().plus(7, ChronoUnit.DAYS);
+    }
+
 }
