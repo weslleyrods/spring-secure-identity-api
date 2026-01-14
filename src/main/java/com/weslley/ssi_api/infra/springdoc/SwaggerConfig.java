@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
             info = @Info(
                     title = "Spring Secure Identity API",
                     version = "1.0",
-                    description = "API para gestão de usuários com autenticação JWT e Refresh Token"
+                    description = "API for user authentication and management using Spring Boot and JWT"
             ),
             security = @SecurityRequirement(name = "bearerAuth")
     )

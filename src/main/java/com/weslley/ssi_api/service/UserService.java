@@ -59,7 +59,7 @@ public class UserService {
 
     public UserModel changeRole (Long id, UserRoleDTO roleDTO) {
         UserModel user = userRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado.")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         );
         UpdateUtil.copyNonNullProperties(roleDTO, user);
         return userRepository.save(user);
@@ -67,7 +67,7 @@ public class UserService {
 
     public void  deleteById(Long id){
         Optional<UserModel> user = userRepository.findById(id);
-        user.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+        user.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         userRepository.deleteById(id);
     }
 

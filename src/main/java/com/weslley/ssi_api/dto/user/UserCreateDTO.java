@@ -9,15 +9,15 @@ import lombok.Data;
 @Data
 public class UserCreateDTO {
 
-    @NotBlank(message = "O nome é obrigatório")
+    @NotBlank(message = "Name is required")
     private String name;
 
-    @NotBlank(message = "O email é obrigatório")
-    @Email(message = "Formato de email inválido")
+    @NotBlank(message = "E-mail is required")
+    @Email(message = "E-mail format is invalid")
     private String email;
 
-    @NotBlank(message = "A senha é obrigatória")
-    @Size(min = 3, message = "A senha deve ter no mínimo 3 caracteres")
+    @NotBlank(message = "Password is required")
+    @Size(min = 3, message = "Password must be at least 3 characters long")
     private String password;
 
 }
