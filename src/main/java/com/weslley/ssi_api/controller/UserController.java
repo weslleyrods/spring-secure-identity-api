@@ -6,6 +6,7 @@ import com.weslley.ssi_api.service.UserService;
 import com.weslley.ssi_api.dto.user.UserResponseDTO;
 import com.weslley.ssi_api.dto.user.UserCreateDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.BeanUtils;
@@ -52,8 +53,10 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
+    public ResponseEntity deleteById(@PathVariable Long id) {
         userService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
+
 
 }

@@ -8,6 +8,7 @@ import com.weslley.ssi_api.repository.UserRepository;
 import com.weslley.ssi_api.utils.UpdateUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -59,15 +60,15 @@ public class UserService {
 
     public UserModel changeRole (Long id, UserRoleDTO roleDTO) {
         UserModel user = userRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+                () -> new UserNotFoundException("User not found")
         );
         UpdateUtil.copyNonNullProperties(roleDTO, user);
         return userRepository.save(user);
     }
 
-    public void  deleteById(Long id){
+    public void deleteById(Long id){
         Optional<UserModel> user = userRepository.findById(id);
-        user.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        user.orElseThrow(() -> new UserNotFoundException("User not found"));
         userRepository.deleteById(id);
     }
 
