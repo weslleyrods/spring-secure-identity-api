@@ -4,12 +4,10 @@ import com.weslley.ssi_api.dto.auth.AuthenticationDTO;
 import com.weslley.ssi_api.dto.auth.LoginResponseDTO;
 import com.weslley.ssi_api.dto.auth.RefreshTokenDTO;
 import com.weslley.ssi_api.infra.security.TokenService;
-import com.weslley.ssi_api.model.RefreshTokenModel;
 import com.weslley.ssi_api.model.UserModel;
-import com.weslley.ssi_api.repository.RefreshTokenRepository;
+import com.weslley.ssi_api.service.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,8 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,7 +24,7 @@ public class AuthenticationController {
     @Autowired
     private TokenService tokenService;
     @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+    private AuthenticationService authenticationService;
 
 
     @PostMapping("/login")
@@ -43,19 +39,7 @@ public class AuthenticationController {
 
     @PostMapping("/refresh")
     public ResponseEntity refresh(@RequestBody @Valid RefreshTokenDTO refreshTokenDTO){
-        String refreshToken = refreshTokenDTO.getRefreshToken();
-
-        Optional<RefreshTokenModel> optionalToken = refreshTokenRepository.findByRefreshToken(refreshToken);
-        if (optionalToken.isEmpty()) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Refresh Token não encontrado!");
-
-        RefreshTokenModel refreshTokenModel = optionalToken.get();
-        UserModel user = refreshTokenModel.getUser();
-        String newAccessToken = tokenService.generateToken(user);
-        String newRefreshToken = tokenService.generateRefreshToken(user);
-
-        refreshTokenRepository.delete(refreshTokenModel);
-
-        return ResponseEntity.ok(new LoginResponseDTO(newAccessToken, newRefreshToken));
+        var tokenResponse = authenticationService.refreshToken(refreshTokenDTO);
+        return ResponseEntity.ok(tokenResponse);
     }
-
 }

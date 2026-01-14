@@ -23,7 +23,7 @@ public class TokenService {
     public String generateToken(UserModel user) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         String token = JWT.create()
-        .withIssuer("demo-crud-api")
+        .withIssuer("ssi-api")
         .withSubject(user.getEmail())
         .withExpiresAt(genExpirationDate())
         .sign(algorithm);
@@ -35,7 +35,7 @@ public class TokenService {
         Instant expirationDate = genRefreshTokenExpirationDate();
         Algorithm algorithm = Algorithm.HMAC256(secret);
         String refreshToken = JWT.create()
-        .withIssuer("demo-crud-api")
+        .withIssuer("ssi-api")
         .withSubject(user.getEmail())
         .withExpiresAt(expirationDate)
         .sign(algorithm);
@@ -49,7 +49,7 @@ public class TokenService {
     public String validateToken(String token) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         return JWT.require(algorithm)
-                .withIssuer("demo-crud-api")
+                .withIssuer("ssi-api")
                 .build()
                 .verify(token)
                 .getSubject();
