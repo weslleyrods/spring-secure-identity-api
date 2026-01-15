@@ -1,4 +1,5 @@
 package com.weslley.ssi_api.infra.security;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +40,19 @@ public class SecurityConfig {
             .requestMatchers("/swagger-ui.html").permitAll()
             .anyRequest().authenticated()
         )
-            .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+        .exceptionHandling(exception -> exception
+            .authenticationEntryPoint((request, response, authException) -> {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"message\": \"Invalid credentials\"}");
+            })
+            .accessDeniedHandler((request, response, accessDeniedException) -> {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"message\": \"Access denied: you are not authorized\"}");
+            })
+        )
+        .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

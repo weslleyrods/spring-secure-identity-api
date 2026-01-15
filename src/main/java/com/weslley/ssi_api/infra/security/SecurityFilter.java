@@ -1,5 +1,7 @@
 package com.weslley.ssi_api.infra.security;
 
+import com.weslley.ssi_api.exception.InvalidTokenException;
+import com.weslley.ssi_api.exception.UserNotFoundException;
 import com.weslley.ssi_api.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,26 +32,34 @@ public class SecurityFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         var token = this.recoverToken(request);
-        if (token != null) {
-            try {
-                var login = tokenService.validateToken(token);
-                if (login != null && !login.isEmpty()) {
-                    UserDetails user = userRepository.findByEmail(login);
-                    if (user != null) {
-                        var authentication = new UsernamePasswordAuthenticationToken(user, login, user.getAuthorities());
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
-
-                }
-            }
-            catch(RuntimeException e){
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"message\": \"" + e.getMessage() + "\"}");
-                    return;
-            }
+        if(token == null){
+            filterChain.doFilter(request, response);
+            return;
         }
-        filterChain.doFilter(request, response);
+        try{
+            var login = tokenService.validateToken(token);
+            if (login == null) throw new InvalidTokenException("Invalid token");
+
+            UserDetails user = userRepository.findByEmail(login);
+            if (user == null) throw new UserNotFoundException("Authenticated user not found");
+
+            var authentication = new UsernamePasswordAuthenticationToken(user, login, user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            filterChain.doFilter(request, response);
+
+        } catch (InvalidTokenException e) {
+            responseError(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+        } catch (UserNotFoundException e) {
+            responseError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+        } catch (RuntimeException e) {
+            responseError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal server error");
+        }
+    }
+
+    private void responseError(HttpServletResponse response, int status, String message) throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"message\": \"" + message + "\"}");
     }
 
     private String recoverToken(HttpServletRequest request) {

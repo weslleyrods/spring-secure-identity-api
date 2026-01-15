@@ -1,19 +1,18 @@
 package com.weslley.ssi_api.service;
+
 import com.weslley.ssi_api.dto.user.UserCreateDTO;
 import com.weslley.ssi_api.dto.user.UserRoleDTO;
 import com.weslley.ssi_api.exception.UserAlreadyExistsException;
 import com.weslley.ssi_api.exception.UserNotFoundException;
 import com.weslley.ssi_api.model.UserModel;
+import com.weslley.ssi_api.repository.RefreshTokenRepository;
 import com.weslley.ssi_api.repository.UserRepository;
 import com.weslley.ssi_api.utils.UpdateUtil;
-
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
-import org.springframework.beans.BeanUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +25,9 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    RefreshTokenRepository refreshTokenRepository;
+
 
 
     public UserModel save(UserModel user){
@@ -66,9 +68,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
     public void deleteById(Long id){
         Optional<UserModel> user = userRepository.findById(id);
+
         user.orElseThrow(() -> new UserNotFoundException("User not found"));
+        refreshTokenRepository.deleteByUser(user);
         userRepository.deleteById(id);
     }
 

@@ -10,6 +10,7 @@ import com.weslley.ssi_api.model.UserModel;
 import com.weslley.ssi_api.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,9 @@ public class AuthenticationService {
 
     public LoginResponseDTO login(AuthenticationDTO authenticationDTO){
         var usernamePassword = new UsernamePasswordAuthenticationToken(authenticationDTO.getEmail(), authenticationDTO.getPassword());
+
         var auth = this.authenticationManager.authenticate(usernamePassword);
+
         var user = (UserModel) auth.getPrincipal();
         var token = tokenService.generateToken(user);
         var refreshToken = tokenService.generateRefreshToken(user);
