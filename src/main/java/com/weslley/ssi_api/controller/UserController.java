@@ -6,6 +6,8 @@ import com.weslley.ssi_api.service.UserService;
 import com.weslley.ssi_api.dto.user.UserResponseDTO;
 import com.weslley.ssi_api.dto.user.UserCreateDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +28,9 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserResponseDTO> findAll() {
-        return userService.findAll().stream()
-                .map(UserResponseDTO::from)
-                .toList();
+    public Page<UserResponseDTO> findAll(Pageable pageable) {
+        return userService.findAll(pageable)
+                .map(UserResponseDTO::from);
     }
 
     @GetMapping("/{id}")

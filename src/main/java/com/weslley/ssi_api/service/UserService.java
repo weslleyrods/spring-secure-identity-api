@@ -10,11 +10,12 @@ import com.weslley.ssi_api.repository.UserRepository;
 import com.weslley.ssi_api.utils.UpdateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 
@@ -37,8 +38,8 @@ public class UserService {
        return userRepository.save(user);
     }
 
-    public List<UserModel> findAll(){
-        return userRepository.findAll();
+    public Page<UserModel> findAll(Pageable pageable){
+        return userRepository.findAll(pageable);
     }
 
     public UserModel findById(Long id){
@@ -71,7 +72,6 @@ public class UserService {
     @Transactional
     public void deleteById(Long id){
         Optional<UserModel> user = userRepository.findById(id);
-
         user.orElseThrow(() -> new UserNotFoundException("User not found"));
         refreshTokenRepository.deleteByUser(user);
         userRepository.deleteById(id);
