@@ -2,12 +2,13 @@ package com.weslley.ssi_api.infra.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.weslley.ssi_api.model.RefreshTokenModel;
+import com.weslley.ssi_api.model.UserModel;
 import com.weslley.ssi_api.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.weslley.ssi_api.model.UserModel;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -47,12 +48,16 @@ public class TokenService {
     }
 
     public String validateToken(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(secret);
-        return JWT.require(algorithm)
-                .withIssuer("ssi-api")
-                .build()
-                .verify(token)
-                .getSubject();
+        try{
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.require(algorithm)
+                    .withIssuer("ssi-api")
+                    .build()
+                    .verify(token)
+                    .getSubject();
+        }catch(JWTVerificationException e) {
+            return null;
+        }
     }
 
 

@@ -51,8 +51,6 @@ public class SecurityFilter extends OncePerRequestFilter {
             responseError(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } catch (UserNotFoundException e) {
             responseError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-        } catch (RuntimeException e) {
-            responseError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
 
