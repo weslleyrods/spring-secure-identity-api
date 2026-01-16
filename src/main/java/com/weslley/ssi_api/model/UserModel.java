@@ -2,14 +2,20 @@ package com.weslley.ssi_api.model;
 
 import com.weslley.ssi_api.model.enums.UserRole;
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class UserModel implements UserDetails {
 
     @Id
@@ -21,7 +27,11 @@ public class UserModel implements UserDetails {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
-
+    @Column(updatable = false)
+    @CreatedDate
+    private LocalDateTime createdAt;
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     public Long getId() {
         return id;
@@ -62,6 +72,22 @@ public class UserModel implements UserDetails {
 
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
     @Override
