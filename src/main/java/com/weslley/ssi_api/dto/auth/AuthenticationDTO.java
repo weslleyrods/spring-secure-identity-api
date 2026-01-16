@@ -4,6 +4,7 @@ import lombok.Data;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.ToString;
 
 @Data
 public class AuthenticationDTO {
@@ -13,5 +14,6 @@ public class AuthenticationDTO {
     private String email;
 
     @NotBlank(message = "Password is required")
+    @ToString.Exclude
     private String password;
 }
