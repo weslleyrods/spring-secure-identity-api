@@ -25,7 +25,7 @@ public class UserController {
 
     @PostMapping
     public UserResponseDTO create(@RequestBody UserCreateDTO userDto) {
-        logger.info("Creating user: {}", userDto);
+        logger.info("Creating user {} / {}", userDto.getName(), userDto.getEmail());
         UserModel userModel = new UserModel();
         BeanUtils.copyProperties(userDto, userModel);
         return UserResponseDTO.from(userService.save(userModel));
@@ -44,21 +44,25 @@ public class UserController {
 
     @PutMapping("/{id}")
     public UserResponseDTO update (@PathVariable Long id, @RequestBody UserCreateDTO userDto) {
+        logger.info("Updating user ID {} e-mail {}", id, userDto.getEmail());
         return UserResponseDTO.from(userService.update(id, userDto));
     }
 
     @PatchMapping("/{id}")
     public UserResponseDTO partialUpdate (@PathVariable Long id, @RequestBody UserCreateDTO userDto) {
+        logger.info("Updating partially user ID {} e-mail {}", id, userDto.getEmail());
         return UserResponseDTO.from(userService.partialUpdate(id, userDto));
     }
 
     @PatchMapping("/{id}/role")
     public UserResponseDTO changeRole (@PathVariable Long id, @RequestBody UserRoleDTO roleDTO) {
+        logger.info("Changing role user ID {} to {} ", id,  roleDTO.getRole());
         return UserResponseDTO.from(userService.changeRole(id, roleDTO));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity deleteById(@PathVariable Long id) {
+        logger.info("Deleting user ID: {}", id);
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
