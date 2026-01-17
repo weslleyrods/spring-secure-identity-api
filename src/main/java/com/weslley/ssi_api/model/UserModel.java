@@ -50,6 +50,7 @@ public class UserModel implements UserDetails {
     }
 
     public String getEmail() {
+
         return email;
     }
 

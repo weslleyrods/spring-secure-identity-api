@@ -50,7 +50,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public UserResponseDTO partialUpdate (@PathVariable Long id, @RequestBody UserCreateDTO userDto) {
-        logger.info("Updating partially user ID {} e-mail {}", id, userDto.getEmail());
+        logger.info("Updating partially user ID {} e-mail {}", id, userDto);
         return UserResponseDTO.from(userService.partialUpdate(id, userDto));
     }
 
