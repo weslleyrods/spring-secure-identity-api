@@ -29,14 +29,9 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO authenticationDTO){
-        try{
-            logger.info("Login request: {}", authenticationDTO);
-            var tokenResponse = authenticationService.login(authenticationDTO);
-            return ResponseEntity.ok(tokenResponse);
-        }catch(BadCredentialsException e){
-            logger.error("Bad credentials for user: {}", authenticationDTO.getEmail());
-            throw new BadCredentialsException("Invalid email or password");
-        }
+        logger.info("Login request: {}", authenticationDTO);
+        var tokenResponse = authenticationService.login(authenticationDTO);
+        return ResponseEntity.ok(tokenResponse);
     }
 
     @PostMapping("/refresh")
