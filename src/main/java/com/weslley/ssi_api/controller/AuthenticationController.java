@@ -38,6 +38,22 @@ public class AuthenticationController {
         return buildAuthenticationResponse(tokenResponse);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity logout(@CookieValue("refreshToken") String refreshToken){
+        logger.info("Logout request: {}", refreshToken);
+        authenticationService.logout(refreshToken);
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
+
     public ResponseEntity<LoginResponseDTO> buildAuthenticationResponse(TokenResult tokenResponse){
         ResponseCookie cookie = ResponseCookie.from("refreshToken", tokenResponse.getRefreshToken())
                 .httpOnly(true)
@@ -52,5 +68,4 @@ public class AuthenticationController {
                         new LoginResponseDTO(tokenResponse.getToken())
                 );
     }
-
 }

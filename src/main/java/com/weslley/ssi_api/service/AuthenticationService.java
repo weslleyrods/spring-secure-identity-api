@@ -47,4 +47,9 @@ public class AuthenticationService {
         refreshTokenRepository.delete(refreshTokenModel);
         return new TokenResult(newAccessToken, newRefreshToken);
     }
+
+    public void logout(String refreshToken){
+        refreshTokenRepository.findByRefreshToken(refreshToken)
+                        .ifPresent(refreshTokenModel -> refreshTokenRepository.delete(refreshTokenModel));
+    }
 }
