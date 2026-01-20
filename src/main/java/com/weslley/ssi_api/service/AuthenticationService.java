@@ -1,8 +1,7 @@
 package com.weslley.ssi_api.service;
 
 import com.weslley.ssi_api.dto.auth.AuthenticationDTO;
-import com.weslley.ssi_api.dto.auth.LoginResponseDTO;
-import com.weslley.ssi_api.dto.auth.RefreshTokenDTO;
+import com.weslley.ssi_api.dto.auth.TokenResult;
 import com.weslley.ssi_api.exception.InvalidTokenException;
 import com.weslley.ssi_api.infra.security.TokenService;
 import com.weslley.ssi_api.model.RefreshTokenModel;
@@ -24,7 +23,7 @@ public class AuthenticationService {
     @Autowired
     private TokenService tokenService;
 
-    public LoginResponseDTO login(AuthenticationDTO authenticationDTO){
+    public TokenResult login(AuthenticationDTO authenticationDTO){
         var usernamePassword = new UsernamePasswordAuthenticationToken(authenticationDTO.getEmail(), authenticationDTO.getPassword());
 
         var auth = this.authenticationManager.authenticate(usernamePassword);
@@ -32,13 +31,12 @@ public class AuthenticationService {
         var user = (UserModel) auth.getPrincipal();
         var token = tokenService.generateToken(user);
         var refreshToken = tokenService.generateRefreshToken(user);
-        return  new LoginResponseDTO(token, refreshToken);
+        return new TokenResult(token, refreshToken);
     }
 
-    public LoginResponseDTO refreshToken(RefreshTokenDTO refreshToken) {
-        String token = refreshToken.getRefreshToken();
+    public TokenResult refreshToken(String refreshToken) {
 
-        Optional<RefreshTokenModel> optionalToken = refreshTokenRepository.findByRefreshToken(token);
+        Optional<RefreshTokenModel> optionalToken = refreshTokenRepository.findByRefreshToken(refreshToken);
         if (optionalToken.isEmpty()) throw new InvalidTokenException("Refresh Token not found!");
 
         RefreshTokenModel refreshTokenModel = optionalToken.get();
@@ -47,6 +45,6 @@ public class AuthenticationService {
         String newRefreshToken = tokenService.generateRefreshToken(user);
 
         refreshTokenRepository.delete(refreshTokenModel);
-        return new LoginResponseDTO(newAccessToken, newRefreshToken);
+        return new TokenResult(newAccessToken, newRefreshToken);
     }
 }
