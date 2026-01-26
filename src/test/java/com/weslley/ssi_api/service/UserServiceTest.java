@@ -10,7 +10,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -54,5 +60,18 @@ public class UserServiceTest {
         Mockito.verify(userRepository, Mockito.times(0)).save(user);
         Mockito.verify(passwordEncoder, Mockito.times(0)).encode(anyString());
     }
+
+    @Test
+    void findAllSuccess(){
+        UserModel user = new UserModel();
+        List<UserModel> userList = List.of(user);
+        Page<UserModel> page = new PageImpl<>(userList);
+        Pageable pageable = Pageable.unpaged();
+
+        Mockito.when(userRepository.findAll(pageable)).thenReturn(page);
+        assertEquals(page, userService.findAll(pageable));
+        Mockito.verify(userRepository, Mockito.times(1)).findAll(pageable);
+    }
+
 
 }
