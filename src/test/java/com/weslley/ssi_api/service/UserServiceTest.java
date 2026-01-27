@@ -1,5 +1,6 @@
 package com.weslley.ssi_api.service;
 
+import com.weslley.ssi_api.dto.user.UserCreateDTO;
 import com.weslley.ssi_api.exception.UserAlreadyExistsException;
 import com.weslley.ssi_api.model.UserModel;
 import com.weslley.ssi_api.repository.RefreshTokenRepository;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -73,5 +75,26 @@ public class UserServiceTest {
         Mockito.verify(userRepository, Mockito.times(1)).findAll(pageable);
     }
 
+    @Test
+    void updateSuccess(){
+        UserModel user = new UserModel();
+        user.setId(1L);
+        user.setName("User Test");
+        user.setEmail("user@email.com");
+        user.setPassword("123456");
+
+        UserCreateDTO userCreateDTO = new UserCreateDTO();
+        userCreateDTO.setName("User Test Edited");
+        userCreateDTO.setEmail("user_edited@email.com");
+        userCreateDTO.setPassword("123456789");
+
+        Mockito.when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.save(user)).thenReturn(user);
+        UserModel result = userService.update(user.getId(), userCreateDTO);
+        assertEquals(userCreateDTO.getName(), result.getName());
+        assertEquals(userCreateDTO.getEmail(), result.getEmail());
+        assertEquals(userCreateDTO.getPassword(), result.getPassword());
+        Mockito.verify(userRepository, Mockito.times(1)).save(user);
+    }
 
 }

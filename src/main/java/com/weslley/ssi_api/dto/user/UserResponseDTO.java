@@ -23,7 +23,14 @@ public class UserResponseDTO {
     private LocalDateTime updatedAt;
 
     public static UserResponseDTO from(UserModel user) {
-        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole(), user.getCreatedAt(), user.getUpdatedAt());
+        return new UserResponseDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole(),
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
     }
 }
 
