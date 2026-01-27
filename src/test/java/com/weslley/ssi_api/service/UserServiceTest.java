@@ -1,5 +1,6 @@
 package com.weslley.ssi_api.service;
 
+import com.weslley.ssi_api.dto.user.UserCreateDTO;
 import com.weslley.ssi_api.exception.UserAlreadyExistsException;
 import com.weslley.ssi_api.model.UserModel;
 import com.weslley.ssi_api.repository.RefreshTokenRepository;
