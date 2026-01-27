@@ -5,6 +5,7 @@ import com.weslley.ssi_api.dto.user.UserResponseDTO;
 import com.weslley.ssi_api.dto.user.UserRoleDTO;
 import com.weslley.ssi_api.model.UserModel;
 import com.weslley.ssi_api.service.UserService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -43,7 +44,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public UserResponseDTO update (@PathVariable Long id, @RequestBody UserCreateDTO userDto) {
+    public UserResponseDTO update (@PathVariable Long id, @RequestBody @Valid UserCreateDTO userDto) {
         logger.info("Updating user ID {} e-mail {}", id, userDto.getEmail());
         return UserResponseDTO.from(userService.update(id, userDto));
     }

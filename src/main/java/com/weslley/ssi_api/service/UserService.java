@@ -49,6 +49,7 @@ public class UserService {
 
     public UserModel update(Long id, UserCreateDTO userDto) {
         UserModel user = userRepository.findById(id).orElseThrow(() ->new UserNotFoundException("User not found"));
+
         BeanUtils.copyProperties(userDto, user, "id");
         return userRepository.save(user);
     }
