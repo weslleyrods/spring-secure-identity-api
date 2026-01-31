@@ -18,6 +18,8 @@ A autenticação é via JWT (JSON Web Token) com estratégia de **Refresh Token*
 * **Infraestrutura:** Docker & Docker Compose
 * **Ferramentas:** Lombok, Maven
 * **Documentação:** SpringDoc OpenAPI (Swagger UI)
+* **Testes:** JUnit 5, Mockito
+* **Logs:** SLF4J
 
 ## Estudos Aplicados
 
@@ -25,9 +27,13 @@ Este projeto foi desenvolvido com foco na aplicação de conceitos avançados de
 
 * **Autenticação Stateless & Stateful:** Implementação híbrida usando Access Token (curta duração) e Refresh Token (longa duração persistido no banco).
 * **Segurança por Camadas:** Proteção de rotas via `SecurityFilterChain`, criptografia de senhas com BCrypt e validação de dados com Bean Validation.
+* **Tratamento Global de Erros**: Centralização de exceptions com @RestControllerAdvice para padronização de respostas HTTP.
+* **Auditoria Automática**: Uso de JPA Auditing para gestão automática de timestamps (createdAt, updatedAt) nas entidades.
 * **Gestão de Segredos:** Uso de variáveis de ambiente e placeholders (`${...}`) para não expor credenciais sensíveis no código-fonte.
 * **Containerização:** Configuração de ambiente de desenvolvimento portátil usando Docker Compose (Aplicação + Banco).
 * **Arquitetura:** Separação de responsabilidades (Controller, Service, Repository, DTOs e Entities).
+* **Testes:** Implementação de testes unitários e de integração com JUnit 5 e Mockito.
+* **Logs:** Implementação de logging com SLF4J e Logback.
 
 ## Documentação Interativa
 
@@ -48,7 +54,8 @@ Lá você poderá:
 * (Opcional) Java 17 e Maven para rodar localmente fora do container.
 
 ### Passo 1: Configuração de Ambiente (.env)
-Por segurança, o projeto não compartilha senhas reais. Crie um arquivo `.env` na raiz do projeto (onde está o `docker-compose.yml`) com o seguinte conteúdo:
+Por segurança, o projeto não compartilha senhas reais. Crie um arquivo `.env` na raiz do projeto 
+(onde está o `docker-compose.yml`) com o seguinte conteúdo:
 
 ```properties
 # Configuração do Banco de Dados
@@ -57,7 +64,14 @@ MYSQL_ROOT_USERNAME=root
 MYSQL_ROOT_PASSWORD=sua_senha_forte_aqui
 
 JWT_SECRET=segredo_super_secreto_para_gerar_token
+
+# Configuração do Admin Inicial (Seed)
+ADMIN_EMAIL=admin@email.com
+ADMIN_PASSWORD=admin
+ADMIN_CREATE=true
 ```
+> **Nota:** Ao iniciar a aplicação pela primeira vez com `ADMIN_CREATE=true`, um usuário administrador será criado 
+> automaticamente com as credenciais definidas no `.env`, permitindo o acesso imediato às rotas protegidas.
 
 ### Passo 2: Rodando com Docker (Recomendado)
 
