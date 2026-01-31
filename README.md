@@ -10,98 +10,99 @@
 
 # Spring Secure Identity API
 
-## Resumo
-API RESTful robusta para gestão de usuários, focada em segurança e boas práticas de desenvolvimento. 
-A aplicação permite o ciclo completo de gerenciamento (CRUD) com controle de acesso baseado em papéis (RBAC).
+## Summary
+Robust RESTful API for user management, focused on security and best development practices.
+The application supports the complete management lifecycle (CRUD) with role-based access control (RBAC).
 
-O sistema diferencia usuários comuns (**USER**) de administradores (**ADMIN**), onde apenas administradores possuem 
-privilégios para remover usuários do sistema e alterar o privilégio de permissão. 
-A autenticação é via JWT (JSON Web Token) com estratégia de **Refresh Token** persistido em banco de dados para maior segurança.
+The system differentiates regular users (USER) from administrators (ADMIN), where only administrators have
+privileges to remove users from the system and change permission levels.
+Authentication is handled via JWT (JSON Web Token) with a Refresh Token strategy persisted in the database for enhanced security.
 
-## Tecnologias Utilizadas
+## Technologies Used
 
-* **Linguagem:** Java 17
+* **Languages:** Java 17
 * **Framework:** Spring Boot 3
-* **Segurança:** Spring Security + JWT (Auth0)
-* **Banco de Dados:** MySQL 8
+* **Security:** Spring Security + JWT (Auth0)
+* **Database:** MySQL 8
 * **ORM:** Hibernate / Spring Data JPA
-* **Infraestrutura:** Docker & Docker Compose
-* **Ferramentas:** Lombok, Maven
-* **Documentação:** SpringDoc OpenAPI (Swagger UI)
-* **Testes:** JUnit 5, Mockito
-* **Logs:** SLF4J & Logback 
+* **Infrastructure:** Docker & Docker Compose
+* **Tools:** Lombok, Maven
+* **Documentation:** SpringDoc OpenAPI (Swagger UI)
+* **Testing:** JUnit 5, Mockito
+* **Logging:** SLF4J & Logback 
 
-## Estudos Aplicados
+## Applied Studies
 
-Este projeto foi desenvolvido com foco na aplicação de conceitos avançados de Engenharia de Software e Segurança:
+This project was developed with a strong focus on applying advanced Software Engineering and Security concepts:
 
-* **Autenticação Stateless & Stateful:** Implementação híbrida usando Access Token (curta duração) e Refresh Token (longa duração persistido no banco).
-* **Segurança por Camadas:** Proteção de rotas via `SecurityFilterChain`, criptografia de senhas com BCrypt e validação de dados com Bean Validation.
-* **Tratamento Global de Erros**: Centralização de exceptions com @RestControllerAdvice para padronização de respostas HTTP.
-* **Auditoria Automática**: Uso de JPA Auditing para gestão automática de timestamps (createdAt, updatedAt) nas entidades.
-* **Gestão de Segredos:** Uso de variáveis de ambiente e placeholders (`${...}`) para não expor credenciais sensíveis no código-fonte.
-* **Containerização:** Configuração de ambiente de desenvolvimento portátil usando Docker Compose (Aplicação + Banco).
-* **Arquitetura:** Separação de responsabilidades (Controller, Service, Repository, DTOs e Entities).
-* **Testes:** Implementação de testes unitários e de integração com JUnit 5 e Mockito.
-* **Logs:** Implementação de logging com SLF4J e Logback.
+* **Stateless & Stateful Authentication:** Hybrid implementation using Access Tokens (short-lived) and Refresh Tokens (long-lived and persisted in the database).
+* **Layered Security:** Route protection via `SecurityFilterChain`, password encryption with BCrypt, and data validation using Bean Validation.
+* **Global Error Handling:** Centralized exception handling with @RestControllerAdvice to standardize HTTP responses.
+* **Automatic Auditing:** Use of JPA Auditing for automatic management of timestamps (createdAt, updatedAt) in entities.
+* **Secrets Management:** Use of environment variables and placeholders (`${...}`) to avoid exposing sensitive credentials in the source code.
+* **Containerization:** Portable development environment setup using Docker Compose (Application + Database).
+* **Architecture:** Clear separation of responsibilities (Controller, Service, Repository, DTOs, and Entities).
+* **Testing:** Implementation of unit and integration tests using JUnit 5 and Mockito.
+* **Logging:** Logging implementation with SLF4J and Logback.
 
-## Documentação Interativa
+## Interactive Documentation
 
-O projeto utiliza **Swagger UI** para documentação e teste automático dos endpoints.
-Após subir a aplicação, acesse:
+The project uses **Swagger UI** for endpoint documentation and interactive testing.
+After starting the application, access:
 
 👉 **http://localhost:8081/swagger-ui.html**
 
-Lá você poderá:
-* Visualizar todos os endpoints disponíveis.
-* Testar requisições (Login, Cadastro, Refresh) diretamente pelo navegador.
-* Autenticar-se usando o botão **Authorize** (copie o token gerado no endpoint de login).
+There you can:
+* View all available endpoints.
+* Test requests (Login, Registration, Refresh) directly in the browser.
+* Authenticate using the Authorize button (copy the token generated by the login endpoint).
 
-## Instalação e Execução
+## Installation and Execution
 
-### Pré-requisitos
-* Docker e Docker Compose instalados.
-* (Opcional) Java 17 e Maven para rodar localmente fora do container.
+### Prerequisites
+* Docker and Docker Compose installed.
+* (Optional) Java 17 and Maven to run locally outside the container.
 
-### Passo 1: Configuração de Ambiente (.env)
-Por segurança, o projeto não compartilha senhas reais. Crie um arquivo `.env` na raiz do projeto 
-(onde está o `docker-compose.yml`) com o seguinte conteúdo:
+### Step 1: Environment Configuration (.env)
+For security reasons, the project does not share real passwords. Create a `.env` file at the project root  
+(where `docker-compose.yml` is located) with the following content:
 
 ```properties
-# Configuração do Banco de Dados
+# Database Configuration
 MYSQL_DATABASE=ssi_db
 MYSQL_ROOT_USERNAME=root
-MYSQL_ROOT_PASSWORD=sua_senha_forte_aqui
+MYSQL_ROOT_PASSWORD=your_strong_password_here
 
-JWT_SECRET=segredo_super_secreto_para_gerar_token
+JWT_SECRET=super_secret_key_to_generate_token
 
-# Configuração do Admin Inicial (Seed)
+# Initial Admin Configuration (Seed)
 ADMIN_EMAIL=admin@email.com
 ADMIN_PASSWORD=admin
 ADMIN_CREATE=true
 ```
-> **Nota:** Ao iniciar a aplicação pela primeira vez com `ADMIN_CREATE=true`, um usuário administrador será criado 
-> automaticamente com as credenciais definidas no `.env`, permitindo o acesso imediato às rotas protegidas.
+> **Note:** When starting the application for the first time with `ADMIN_CREATE=true`, an administrator user will be
+automatically created with the credentials defined in the `.env` file, allowing immediate access to protected routes.
 
-### Passo 2: Rodando com Docker (Recomendado)
+### Step 2: Running with Docker (Recommended)
 
-Na raiz do projeto, execute:
+At the project root, run:
 
 ```docker
 docker compose up --build
 ```
-A API estará disponível em: http://localhost:8081
 
-### Passo 3: Rodando Localmente (Sem Docker)
+The API will be available at: http://localhost:8081
 
-Caso queira rodar a aplicação via IDE (IntelliJ/Eclipse) e apenas o banco no Docker:
+### Step 3: Running Locally (Without Docker)
 
-Suba apenas o banco: 
+If you want to run the application via an IDE (IntelliJ/Eclipse) and use Docker only for the database:
+
+Start only the database:
 
 ```docker
 docker compose up db -d
 ```
 
-A aplicação usará automaticamente as configurações padrão de desenvolvimento (localhost, user: root, pass: password) 
-definidas no application.properties via fallback.
+The application will automatically use the default development settings (localhost, user: root, pass: password)
+defined in application.properties as a fallback.
 
