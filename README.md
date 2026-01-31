@@ -1,3 +1,13 @@
+
+<div align="center">
+  <a href="README.md">
+    <img src="https://img.shields.io/badge/lang-pt--br-green.svg" alt="Português">
+  </a>
+  <a href="README.en.md">
+    <img src="https://img.shields.io/badge/lang-en-red.svg" alt="English">
+  </a>
+</div>
+
 # Spring Secure Identity API
 
 ## Resumo
@@ -19,7 +29,7 @@ A autenticação é via JWT (JSON Web Token) com estratégia de **Refresh Token*
 * **Ferramentas:** Lombok, Maven
 * **Documentação:** SpringDoc OpenAPI (Swagger UI)
 * **Testes:** JUnit 5, Mockito
-* **Logs:** SLF4J
+* **Logs:** SLF4J & Logback 
 
 ## Estudos Aplicados
 
@@ -77,8 +87,8 @@ ADMIN_CREATE=true
 
 Na raiz do projeto, execute:
 
-```properties
-docker-compose up --build
+```docker
+docker compose up --build
 ```
 A API estará disponível em: http://localhost:8081
 
@@ -88,8 +98,8 @@ Caso queira rodar a aplicação via IDE (IntelliJ/Eclipse) e apenas o banco no D
 
 Suba apenas o banco: 
 
-```properties
-docker-compose up db -d
+```docker
+docker compose up db -d
 ```
 
 A aplicação usará automaticamente as configurações padrão de desenvolvimento (localhost, user: root, pass: password) 
