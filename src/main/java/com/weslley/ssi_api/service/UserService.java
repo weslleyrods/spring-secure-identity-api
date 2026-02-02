@@ -29,8 +29,6 @@ public class UserService {
     @Autowired
     RefreshTokenRepository refreshTokenRepository;
 
-
-
     public UserModel save(UserModel user){
        var userExists = userRepository.findByEmail(user.getEmail());
        if (userExists != null) throw new UserAlreadyExistsException("Email already exists");
