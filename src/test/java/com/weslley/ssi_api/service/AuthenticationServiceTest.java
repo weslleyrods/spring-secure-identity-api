@@ -1,5 +1,6 @@
 package com.weslley.ssi_api.service;
 
+import com.weslley.ssi_api.builder.UserBuilder;
 import com.weslley.ssi_api.dto.auth.AuthenticationDTO;
 import com.weslley.ssi_api.dto.auth.TokenResult;
 import com.weslley.ssi_api.infra.security.TokenService;
@@ -8,6 +9,7 @@ import com.weslley.ssi_api.model.UserModel;
 import com.weslley.ssi_api.repository.RefreshTokenRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -37,11 +39,7 @@ public class AuthenticationServiceTest {
 
     @Test
     void loginSuccess(){
-        UserModel userModel = new UserModel();
-        userModel.setId(1L);
-        userModel.setName("User Test");
-        userModel.setEmail("user@email.com");
-        userModel.setPassword("123456");
+        UserModel userModel = UserBuilder.aUser().build();
 
         AuthenticationDTO authenticationDTO = new AuthenticationDTO();
         authenticationDTO.setEmail(userModel.getEmail());
@@ -49,7 +47,7 @@ public class AuthenticationServiceTest {
 
         var usernamePassword = new UsernamePasswordAuthenticationToken(authenticationDTO.getEmail(), authenticationDTO.getPassword());
         Authentication auth = Mockito.mock(Authentication.class);
-        Mockito.when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
+        Mockito.when(authenticationManager.authenticate(usernamePassword)).thenReturn(auth);
         Mockito.when(auth.getPrincipal()).thenReturn(userModel);
 
         Mockito.when(tokenService.generateToken(userModel)).thenReturn("token");
@@ -62,23 +60,21 @@ public class AuthenticationServiceTest {
 
         Mockito.verify(tokenService, Mockito.times(1)).generateToken(userModel);
         Mockito.verify(tokenService, Mockito.times(1)).generateRefreshToken(userModel);
-        Mockito.verify(authenticationManager, Mockito.times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        Mockito.verify(authenticationManager, Mockito.times(1))
+                .authenticate(ArgumentMatchers.refEq(usernamePassword));
     }
 
 
     @Test
     void refreshTokenSuccess(){
         RefreshTokenModel refreshTokenModel = new RefreshTokenModel();
-        UserModel user = new UserModel();
-        user.setId(1L);
-        user.setName("User Test");
-        user.setEmail("user@email.com");
-        user.setPassword("123456");
-        refreshTokenModel.setUser(user);
+        UserModel userModel = UserBuilder.aUser().build();
+
+        refreshTokenModel.setUser(userModel);
 
         Mockito.when(refreshTokenRepository.findByRefreshToken(anyString())).thenReturn(Optional.of(refreshTokenModel));
-        Mockito.when(tokenService.generateToken(user)).thenReturn("token");
-        Mockito.when(tokenService.generateRefreshToken(user)).thenReturn("newRefreshToken");
+        Mockito.when(tokenService.generateToken(userModel)).thenReturn("token");
+        Mockito.when(tokenService.generateRefreshToken(userModel)).thenReturn("newRefreshToken");
 
         TokenResult result = authenticationService.refreshToken("oldRefreshToken");
 
@@ -86,19 +82,15 @@ public class AuthenticationServiceTest {
         assertEquals("newRefreshToken", result.getRefreshToken());
 
         Mockito.verify(refreshTokenRepository, Mockito.times(1)).delete(refreshTokenModel);
-        Mockito.verify(tokenService, Mockito.times(1)).generateToken(user);
-        Mockito.verify(tokenService, Mockito.times(1)).generateRefreshToken(user);
+        Mockito.verify(tokenService, Mockito.times(1)).generateToken(userModel);
+        Mockito.verify(tokenService, Mockito.times(1)).generateRefreshToken(userModel);
     }
 
     @Test
     void logout(){
         RefreshTokenModel refreshTokenModel = new RefreshTokenModel();
-        UserModel user = new UserModel();
-        user.setId(1L);
-        user.setName("User Test");
-        user.setEmail("user@email.com");
-        user.setPassword("123456");
-        refreshTokenModel.setUser(user);
+        UserModel userModel = UserBuilder.aUser().build();
+        refreshTokenModel.setUser(userModel);
 
         Mockito.when(refreshTokenRepository.findByRefreshToken(anyString())).thenReturn(Optional.of(refreshTokenModel));
         authenticationService.logout("refreshToken");

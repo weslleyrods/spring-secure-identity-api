@@ -1,5 +1,6 @@
 package com.weslley.ssi_api.service;
 
+import com.weslley.ssi_api.builder.UserBuilder;
 import com.weslley.ssi_api.dto.user.UserCreateDTO;
 import com.weslley.ssi_api.dto.user.UserRoleDTO;
 import com.weslley.ssi_api.exception.UserAlreadyExistsException;
@@ -39,28 +40,24 @@ public class UserServiceTest {
 
     @Test
     void createUserSuccess() {
-        UserModel user = new UserModel();
-        user.setEmail("user@email.com");
-        user.setPassword("123456");
+        UserModel userModel = UserBuilder.aUser().build();
 
         Mockito.when(userRepository.findByEmail(anyString())).thenReturn(null);
-        Mockito.when(userRepository.save(user)).thenReturn(user);
+        Mockito.when(userRepository.save(userModel)).thenReturn(userModel);
         Mockito.when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        UserModel result = userService.save(user);
-        assertEquals(user, result);
-        Mockito.verify(userRepository, Mockito.times(1)).save(user);
+        UserModel result = userService.save(userModel);
+        assertEquals(userModel, result);
+        Mockito.verify(userRepository, Mockito.times(1)).save(userModel);
         Mockito.verify(passwordEncoder, Mockito.times(1)).encode(anyString());
     }
 
     @Test
         void createUserUnsuccess(){
-        UserModel user = new UserModel();
-        user.setEmail("user2@email.com");
-        user.setPassword("123456");
+        UserModel userModel = UserBuilder.aUser().build();
 
-        Mockito.when(userRepository.findByEmail(anyString())).thenReturn(user);
-        assertThrows(UserAlreadyExistsException.class, () -> userService.save(user));
-        Mockito.verify(userRepository, Mockito.times(0)).save(user);
+        Mockito.when(userRepository.findByEmail(anyString())).thenReturn(userModel);
+        assertThrows(UserAlreadyExistsException.class, () -> userService.save(userModel));
+        Mockito.verify(userRepository, Mockito.times(0)).save(userModel);
         Mockito.verify(passwordEncoder, Mockito.times(0)).encode(anyString());
     }
 
@@ -78,68 +75,55 @@ public class UserServiceTest {
 
     @Test
     void updateSuccess(){
-        UserModel user = new UserModel();
-        user.setId(1L);
-        user.setName("User Test");
-        user.setEmail("user@email.com");
-        user.setPassword("123456");
+        UserModel userModel = UserBuilder.aUser().build();
 
         UserCreateDTO userCreateDTO = new UserCreateDTO();
         userCreateDTO.setName("User Test Edited");
         userCreateDTO.setEmail("user_edited@email.com");
         userCreateDTO.setPassword("123456789");
 
-        Mockito.when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        Mockito.when(userRepository.save(user)).thenReturn(user);
-        UserModel result = userService.update(user.getId(), userCreateDTO);
+        Mockito.when(userRepository.findById(userModel.getId())).thenReturn(Optional.of(userModel));
+        Mockito.when(userRepository.save(userModel)).thenReturn(userModel);
+        UserModel result = userService.update(userModel.getId(), userCreateDTO);
         assertEquals(userCreateDTO.getName(), result.getName());
         assertEquals(userCreateDTO.getEmail(), result.getEmail());
         assertEquals(userCreateDTO.getPassword(), result.getPassword());
-        Mockito.verify(userRepository, Mockito.times(1)).save(user);
+        Mockito.verify(userRepository, Mockito.times(1)).save(userModel);
     }
 
     @Test
     void partialUpdateSuccess(){
-        UserModel user = new UserModel();
-        user.setId(1L);
-        user.setName("User Test");
-        user.setEmail("user@email.com");
-        user.setPassword("123456");
+        UserModel userModel = UserBuilder.aUser().build();
 
         UserCreateDTO userCreateDTO = new UserCreateDTO();
         userCreateDTO.setName("User Test Partial Edited");
         userCreateDTO.setEmail("user_partial_edited@email.com");
 
-        Mockito.when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        Mockito.when(userRepository.save(user)).thenReturn(user);
-        UserModel result = userService.partialUpdate(user.getId(), userCreateDTO);
+        Mockito.when(userRepository.findById(userModel.getId())).thenReturn(Optional.of(userModel));
+        Mockito.when(userRepository.save(userModel)).thenReturn(userModel);
+        UserModel result = userService.partialUpdate(userModel.getId(), userCreateDTO);
         assertEquals(userCreateDTO.getName(), result.getName());
         assertEquals(userCreateDTO.getEmail(), result.getEmail());
         assertEquals("123456", result.getPassword());
-        Mockito.verify(userRepository, Mockito.times(1)).save(user);
+        Mockito.verify(userRepository, Mockito.times(1)).save(userModel);
     }
 
     @Test
     void changeRoleSuccess(){
-        UserModel user = new UserModel();
-        user.setId(1L);
-        user.setName("User Test");
-        user.setEmail("user@email.com");
-        user.setPassword("123456");
-        user.setRole(UserRole.USER);
+        UserModel userModel = UserBuilder.aUser().build();
 
         UserRoleDTO userRoleDTO = new UserRoleDTO();
         userRoleDTO.setRole(UserRole.ADMIN);
         
-        Mockito.when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        Mockito.when(userRepository.save(user)).thenReturn(user);
-        UserModel result = userService.changeRole(user.getId(), userRoleDTO);
+        Mockito.when(userRepository.findById(userModel.getId())).thenReturn(Optional.of(userModel));
+        Mockito.when(userRepository.save(userModel)).thenReturn(userModel);
+        UserModel result = userService.changeRole(userModel.getId(), userRoleDTO);
         assertEquals(1L, result.getId());
         assertEquals("User Test", result.getName());
         assertEquals("user@email.com", result.getEmail());
         assertEquals("123456", result.getPassword());
         assertEquals(UserRole.ADMIN, result.getRole());
-        Mockito.verify(userRepository, Mockito.times(1)).save(user);
+        Mockito.verify(userRepository, Mockito.times(1)).save(userModel);
     }
 
 }
