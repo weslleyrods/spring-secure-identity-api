@@ -10,7 +10,6 @@ public class UserBuilder {
     private String email = "user@email.com";
     private String password = "123456";
     private UserRole role = UserRole.USER;
-    // Static method to start the builder
     public static UserBuilder aUser() {
         return new UserBuilder();
     }
