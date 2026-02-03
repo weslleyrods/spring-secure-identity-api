@@ -24,11 +24,11 @@ public class AuthenticationService {
     private TokenService tokenService;
 
     public TokenResult login(AuthenticationDTO authenticationDTO){
+
         var usernamePassword = new UsernamePasswordAuthenticationToken(authenticationDTO.getEmail(), authenticationDTO.getPassword());
-
         var auth = this.authenticationManager.authenticate(usernamePassword);
-
         var user = (UserModel) auth.getPrincipal();
+
         var token = tokenService.generateToken(user);
         var refreshToken = tokenService.generateRefreshToken(user);
         return new TokenResult(token, refreshToken);
