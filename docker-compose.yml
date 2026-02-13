@@ -13,6 +13,8 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - ADMIN_CREATE=${ADMIN_CREATE}
+
+      - APP_FRONTEND_URL_LOCAL=${APP_FRONTEND_URL_LOCAL}
     depends_on:
       db:
         condition: service_healthy
