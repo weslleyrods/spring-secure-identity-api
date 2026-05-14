@@ -79,6 +79,9 @@ JWT_SECRET=segredo_super_secreto_para_gerar_token
 ADMIN_EMAIL=admin@email.com
 ADMIN_PASSWORD=admin
 ADMIN_CREATE=true
+
+# Configuração do Frontend (CORS)
+APP_FRONTEND_URL_LOCAL=http://localhost:4200
 ```
 > **Nota:** Ao iniciar a aplicação pela primeira vez com `ADMIN_CREATE=true`, um usuário administrador será criado 
 > automaticamente com as credenciais definidas no `.env`, permitindo o acesso imediato às rotas protegidas.
@@ -102,6 +105,6 @@ Suba apenas o banco:
 docker compose up db -d
 ```
 
-A aplicação usará automaticamente as configurações padrão de desenvolvimento (localhost, user: root, pass: password) 
+A aplicação usará automaticamente as configurações padrão de desenvolvimento (localhost, user: root, pass: 12345) 
 definidas no application.properties via fallback.
 
