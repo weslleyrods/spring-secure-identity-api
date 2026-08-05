@@ -18,12 +18,12 @@ jobs:
 
     steps:
       # Baixa o código do repositório para o runner.
-      - name: Checkout do Código
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       # Instala o Java 17, alinhado com a versão definida no pom.xml do projeto.
       # O cache do Maven acelera execuções futuras, evitando baixar as dependências repetidamente.
-      - name: Configurar JDK 17 (Temurin)
+      - name: Set Up JDK 17 (Temurin)
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -31,11 +31,11 @@ jobs:
           cache: maven
 
       # Garante que o script do Maven receba permissão de execução no ambiente Linux do runner.
-      - name: Dar permissão de execução ao Maven Wrapper
+      - name: Grant Execute Permission to Maven Wrapper
         run: chmod +x mvnw
 
       # Executa o ciclo de vida do Maven para limpar builds anteriores, compilar e rodar os testes.
-      - name: Compilar e Executar Testes
+      - name: Build and Run Tests
         run: ./mvnw clean test
 
   # Job 2: Focado na Entrega Contínua (CD). Constrói e armazena a imagem Docker.
@@ -53,16 +53,16 @@ jobs:
 
     steps:
       # É necessário fazer o checkout novamente porque cada job roda em um ambiente virtual isolado.
-      - name: Checkout do Código
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       # Utiliza o Dockerfile na raiz do projeto para criar a imagem.
       # A variável github.repository insere automaticamente o formato "usuario/repositorio".
-      - name: Construir imagem Docker
+      - name: Build Docker Image
         run: docker build -t ghcr.io/${{ github.repository }}:latest .
 
       # Autentica no GitHub Container Registry usando um token gerado automaticamente pela própria esteira.
-      - name: Login no GitHub Container Registry
+      - name: Log In to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -70,9 +70,18 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # Envia a imagem construída localmente no runner para o registro remoto.
-      - name: Push da imagem para o GHCR
+      - name: Push Docker Image to GHCR
         run: docker push ghcr.io/${{ github.repository }}:latest
 
-      # Envia a nova imagem para o Render
-      - name: Acionar Deploy no Render
+  # Job 3: Focado no Deploy Contínuo (CD) para o Render.
+  deploy-render:
+    name: Deploy to Render
+    # Garante que este job só inicia após o sucesso do job anterior.
+    needs: docker-build-push
+    # Executa apenas em pushes na branch main.
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Render Deployment
         run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
