@@ -1,0 +1,71 @@
+name: CI/CD Pipeline - Spring Secure Identity API
+
+# Define os gatilhos (triggers) que iniciam a esteira.
+on:
+  # Executa a esteira quando há um push direto nas branches main ou develop.
+  push:
+    branches: [ "main", "develop" ]
+  # Executa a esteira quando um Pull Request é aberto ou atualizado com destino à branch main.
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # Job 1: Focado na Integração Contínua (CI). Garante que o código compila e os testes passam.
+  build-and-test:
+    name: Build & Test (CI)
+    # Define o ambiente virtual (runner) fornecido pelo GitHub.
+    runs-on: ubuntu-latest
+
+    steps:
+      # Baixa o código do repositório para o runner.
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      # Instala o Java 17, alinhado com a versão definida no pom.xml do projeto.
+      # O cache do Maven acelera execuções futuras, evitando baixar as dependências repetidamente.
+      - name: Configurar JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # Garante que o script do Maven receba permissão de execução no ambiente Linux do runner.
+      - name: Dar permissão de execução ao Maven Wrapper
+        run: chmod +x mvnw
+
+      # Executa o ciclo de vida do Maven para limpar builds anteriores, compilar e rodar os testes.
+      - name: Compilar e Executar Testes
+        run: ./mvnw clean test
+
+  # Job 2: Focado na Entrega Contínua (CD). Constrói e armazena a imagem Docker.
+  docker-build-push:
+    name: Docker Build & Push (CD)
+    # Este job aguarda a conclusão com sucesso do job 'build-and-test' antes de iniciar.
+    needs: build-and-test
+    # Condição de segurança: só gera a imagem se o evento for um push direto na branch main.
+    # Evita que Pull Requests intermediários gerem imagens que poderiam ir para produção.
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      # É necessário fazer o checkout novamente porque cada job roda em um ambiente virtual isolado.
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      # Utiliza o Dockerfile na raiz do projeto para criar a imagem.
+      # A variável github.repository insere automaticamente o formato "usuario/repositorio".
+      - name: Construir imagem Docker
+        run: docker build -t ghcr.io/${{ github.repository }}:latest .
+
+      # Autentica no GitHub Container Registry usando um token gerado automaticamente pela própria esteira.
+      - name: Login no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Envia a imagem construída localmente no runner para o registro remoto.
+      - name: Push da imagem para o GHCR
+        run: docker push ghcr.io/${{ github.repository }}:latest
