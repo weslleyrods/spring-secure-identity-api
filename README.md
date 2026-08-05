@@ -23,7 +23,7 @@ Authentication is handled via JWT (JSON Web Token) with a Refresh Token strategy
 * **Languages:** Java 17
 * **Framework:** Spring Boot 3
 * **Security:** Spring Security + JWT (Auth0)
-* **Database:** MySQL 8
+* **Database:** PostgreSQL 16
 * **ORM:** Hibernate / Spring Data JPA
 * **Infrastructure:** Docker & Docker Compose
 * **Tools:** Lombok, Maven
@@ -69,9 +69,9 @@ For security reasons, the project does not share real passwords. Create a `.env`
 
 ```properties
 # Database Configuration
-MYSQL_DATABASE=ssi_db
-MYSQL_ROOT_USERNAME=root
-MYSQL_ROOT_PASSWORD=your_strong_password_here
+POSTGRES_DB=ssi_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_strong_password_here
 
 JWT_SECRET=super_secret_key_to_generate_token
 
@@ -106,6 +106,6 @@ Start only the database:
 docker compose up db -d
 ```
 
-The application will automatically use the default development settings (localhost, user: root, pass: 12345)
+The application will automatically use the default development settings (localhost, user: postgres, pass: 12345)
 defined in application.properties as a fallback.
 
