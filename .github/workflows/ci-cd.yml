@@ -72,3 +72,7 @@ jobs:
       # Envia a imagem construída localmente no runner para o registro remoto.
       - name: Push da imagem para o GHCR
         run: docker push ghcr.io/${{ github.repository }}:latest
+
+      # Envia a nova imagem para o Render
+      - name: Acionar Deploy no Render
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
