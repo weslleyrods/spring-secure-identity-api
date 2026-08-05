@@ -40,6 +40,9 @@ jobs:
 
   # Job 2: Focado na Entrega Contínua (CD). Constrói e armazena a imagem Docker.
   docker-build-push:
+    permissions:
+      contents: read
+      packages: write
     name: Docker Build & Push (CD)
     # Este job aguarda a conclusão com sucesso do job 'build-and-test' antes de iniciar.
     needs: build-and-test
