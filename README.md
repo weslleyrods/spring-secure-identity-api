@@ -26,6 +26,7 @@ Authentication is handled via JWT (JSON Web Token) with a Refresh Token strategy
 * **Database:** PostgreSQL 16
 * **ORM:** Hibernate / Spring Data JPA
 * **Infrastructure:** Docker & Docker Compose
+* **CI/CD & Registry:** GitHub Actions, GitHub Container Registry (GHCR), Render
 * **Tools:** Lombok, Maven
 * **Documentation:** SpringDoc OpenAPI (Swagger UI)
 * **Testing:** JUnit 5, Mockito
@@ -41,9 +42,45 @@ This project was developed with a strong focus on applying advanced Software Eng
 * **Automatic Auditing:** Use of JPA Auditing for automatic management of timestamps (createdAt, updatedAt) in entities.
 * **Secrets Management:** Use of environment variables and placeholders (`${...}`) to avoid exposing sensitive credentials in the source code.
 * **Containerization:** Portable development environment setup using Docker Compose (Application + Database).
+* **Multi-Stage Docker Builds:** Optimized 2-stage build (JDK build stage + JRE Alpine runtime stage) reducing final image size and deployment time.
+* **CI/CD & Automated Deployment:** Complete GitHub Actions pipeline with automated build/testing (CI), image packaging & push to GHCR with `:latest` and `:${{ github.sha }}` tags (CD), and automated deployment trigger via Render Deploy Hook.
 * **Architecture:** Clear separation of responsibilities (Controller, Service, Repository, DTOs, and Entities).
 * **Testing:** Implementation of unit and integration tests using JUnit 5 and Mockito.
 * **Logging:** Logging implementation with SLF4J and Logback.
+
+## CI/CD Pipeline & Continuous Deployment
+
+The repository includes a fully automated **GitHub Actions Workflow** (`.github/workflows/ci-cd.yml`) divided into 3 automated stages:
+
+```mermaid
+flowchart TD
+    A[Push / Pull Request] --> B[Job 1: Build & Test - CI]
+    B --> C[Setup Java 17 + Maven Cache]
+    C --> D[Run ./mvnw clean test]
+    D --> E{Passed Tests?}
+    E -- Push on main --> F[Job 2: Docker Build & Push - CD]
+    E -- PR / Failed --> G[Pipeline Stopped]
+    F --> H[Build Multi-Stage Image]
+    H --> I[Push to GHCR with :latest & :SHA]
+    I --> J[Job 3: Deploy to Render]
+    J --> K[Trigger Render Deploy Hook POST]
+```
+
+### Pipeline Jobs Breakdown:
+
+1. **`build-and-test` (Continuous Integration)**:
+   - Triggers on `push` to `main`/`develop` and `pull_request` to `main`.
+   - Sets up JDK 17 (Temurin) with Maven dependency caching.
+   - Runs unit and integration tests via `./mvnw clean test`.
+
+2. **`docker-build-push` (Continuous Delivery)**:
+   - Runs only after successful tests on direct pushes to `main`.
+   - Authenticates with **GitHub Container Registry (GHCR)** using `secrets.GITHUB_TOKEN`.
+   - Builds and pushes the Docker image with dual tagging: `:latest` and `:${{ github.sha }}` for reliable rollback support.
+
+3. **`deploy-render` (Continuous Deployment)**:
+   - Triggers after successful image push on `main`.
+   - Sends an HTTP POST request to the `secrets.RENDER_DEPLOY_HOOK_URL` to update the live cloud service.
 
 ## Interactive Documentation
 
