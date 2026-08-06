@@ -59,7 +59,7 @@ jobs:
       # Utiliza o Dockerfile na raiz do projeto para criar a imagem.
       # A variável github.repository insere automaticamente o formato "usuario/repositorio".
       - name: Build Docker Image
-        run: docker build -t ghcr.io/${{ github.repository }}:latest .
+        run: docker build -t ghcr.io/${{ github.repository }}:latest -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
 
       # Autentica no GitHub Container Registry usando um token gerado automaticamente pela própria esteira.
       - name: Log In to GitHub Container Registry
@@ -71,7 +71,9 @@ jobs:
 
       # Envia a imagem construída localmente no runner para o registro remoto.
       - name: Push Docker Image to GHCR
-        run: docker push ghcr.io/${{ github.repository }}:latest
+        run: |
+          docker push ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
 
   # Job 3: Focado no Deploy Contínuo (CD) para o Render.
   deploy-render:
